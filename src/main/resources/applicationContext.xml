@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--指定数据库连接属性文件的位置    -->
+    <context:property-placeholder location="classpath:db.properties"/>
+
+    <!--配置数据源 -->
+    <bean id = "dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${driver}"></property>
+        <property name="jdbcUrl" value="${url}"></property>
+        <property name="user" value="${user}"></property>
+        <property name="password" value="${password}"></property>
+        <!--配置数据库连接池的初始连接数、最小链接数、获取连接数、最大连接数、最大空闲时间-->
+        <property name="initialPoolSize" value="10"></property>
+        <property name="minPoolSize" value="10"></property>
+        <property name="acquireIncrement" value="5"></property>
+        <property name="maxPoolSize" value="100"></property>
+        <property name="maxIdleTime" value="30"></property>
+    </bean>
+
+    <!--构建sqlSessionFactory    -->
+    <bean id = "sqlSession" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"></property>
+        <!--指定别名        -->
+        <property name="typeAliasesPackage" value="cn.edu.hbpu.news2021.model"></property>
+        <property name="mapperLocations" value="classpath:cn/esileme/mapper/*.xml" ></property>
+        <property name="plugins">
+            <set>
+                <bean class="com.github.pagehelper.PageInterceptor">
+                    <property name="properties">
+                        <props></props>
+                    </property>
+                </bean>
+            </set>
+        </property>
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="cn.esileme.mapper"></property>
+    </bean>
+
+    <context:component-scan base-package="cn.esileme.service"/>
+</beans>
